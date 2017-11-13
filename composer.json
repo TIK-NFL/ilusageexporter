@@ -1,0 +1,17 @@
+{
+	"autoload" : {
+		"psr-4" : {
+			"TIK-NFL\\Prometheus-ilias-exporter\\" : "src"
+		}
+	},
+	"name" : "TIK-NFL/Prometheus-ilias-exporter",
+	"require" : {
+		"php" : ">=7.0",
+		"jimdo/prometheus_client_php" : "~0.9"
+	},
+	"authors" : [{
+			"name" : "Leon Kiefer",
+			"email" : "leon.kiefer@tik.uni-stuttgart.de"
+		}
+	]
+}
