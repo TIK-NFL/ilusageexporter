@@ -90,6 +90,38 @@ class IliasExporter
         ]);
     }
     
+    private function execute_objecttypeusage($registry)
+    {
+        $sql = "SELECT type, COUNT(obj_id) FROM `object_data` GROUP BY type";
+        $result = $this->con->query($sql);
+        
+        $gauge = $registry->getOrRegisterGauge('ilias', 'objecttypeusage', 'Object type usage', [
+            'ObjectType'
+        ]);
+        
+        while ($questiontype = $result->fetch_row()) {
+            $gauge->set($questiontype[1], [
+                $questiontype[0]
+            ]);
+        }
+    }
+
+    private function execute_questiontypeusage($registry)
+    {
+        $sql = "SELECT qpl_qst_type.type_tag , COUNT(tst_test_question.test_question_id) FROM `tst_test_question` LEFT JOIN `qpl_questions` ON tst_test_question.question_fi = qpl_questions.question_id RIGHT JOIN qpl_qst_type ON qpl_questions.question_type_fi = qpl_qst_type.question_type_id GROUP BY qpl_qst_type.question_type_id";
+        $result = $this->con->query($sql);
+        
+        $gauge = $registry->getOrRegisterGauge('ilias', 'questiontypeusage', 'Question type usage', [
+            'QuestionType'
+        ]);
+        
+        while ($questiontype = $result->fetch_row()) {
+            $gauge->set($questiontype[1], [
+                $questiontype[0]
+            ]);
+        }
+    }
+
     public function run()
     {
         $adapter = new Prometheus\Storage\InMemory();
@@ -102,6 +134,8 @@ class IliasExporter
         $this->execute_60minavg($registry);
         $this->execute_total1day($registry);
         $this->execute_total90days($registry);
+        $this->execute_objecttypeusage($registry);
+        $this->execute_questiontypeusage($registry);
         
         if ($this->con) {
             $this->con->close();
