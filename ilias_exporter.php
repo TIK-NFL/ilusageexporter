@@ -78,6 +78,18 @@ class IliasExporter
         ]);
     }
 
+    private function execute_total7day($registry)
+    {
+        $result = $this->con->query("select count(usr_id) FROM  `usr_data` WHERE last_login >= DATE_SUB( NOW( ) , INTERVAL 7 DAY )");
+        $usrs = $result->fetch_row()[0];
+        $gauge = $registry->getOrRegisterGauge('ilias', 'total7day', 'Users in last 7 days', [
+            'iltotal7day'
+        ]);
+        $gauge->set($usrs, [
+            'iltotal7day'
+        ]);
+    }
+
     private function execute_total90days($registry)
     {
         $result = $this->con->query("select count(usr_id) FROM  `usr_data` WHERE last_login >= DATE_SUB( NOW( ) , INTERVAL 90 DAY )");
@@ -133,6 +145,7 @@ class IliasExporter
         $this->execute_10minavg($registry);
         $this->execute_60minavg($registry);
         $this->execute_total1day($registry);
+        $this->execute_total7day($registry);
         $this->execute_total90days($registry);
         $this->execute_objecttypeusage($registry);
         $this->execute_questiontypeusage($registry);
