@@ -134,6 +134,21 @@ class IliasExporter
         }
     }
 
+    private function execute_ecseventscount($registry)
+    {
+        $sql = "SELECT COUNT(id) FROM `ecs_events`";
+        $result = $this->con->query($sql);
+        $events = $result->fetch_row()[0];
+
+        $gauge = $registry->getOrRegisterGauge('ilias', 'ecseventscount', 'ECS Events Count', [
+            'ilecsevents'
+        ]);
+
+        $gauge->set($events, [
+            'ilecsevents'
+        ]);
+    }
+
     public function run()
     {
         $adapter = new Prometheus\Storage\InMemory();
@@ -149,6 +164,7 @@ class IliasExporter
         $this->execute_total90days($registry);
         $this->execute_objecttypeusage($registry);
         $this->execute_questiontypeusage($registry);
+        $this->execute_ecseventscount($registry);
         
         if ($this->con) {
             $this->con->close();
